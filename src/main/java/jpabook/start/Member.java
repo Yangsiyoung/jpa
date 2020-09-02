@@ -8,13 +8,20 @@ import java.util.Date;
 
 @Setter
 @Getter
-@Table(name = "MEMBER", uniqueConstraints = {@UniqueConstraint( name = "NAME_UNIQ", columnNames = {"NAME"})})
+@Table(name = "MEMBER"
+        , uniqueConstraints = {@UniqueConstraint( name = "NAME_UNIQ", columnNames = {"NAME"})})
 @Entity
+@SequenceGenerator(name = "MEMBER_SEQUENCE_GENERATOR"
+        , sequenceName = "MEMBER_SEQ_IN_DB"
+        , initialValue = 1
+        , allocationSize = 1)
 public class Member {
-
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE
+                    , generator =  "MEMBER_SEQUENCE_GENERATOR")
     @Column(name = "ID")
-    private String id;
+    private Long id;
 
     // Runtime 시 nullable, length Check 가 되는 것이 아니라 DDL 에 관련된 조건
     // null check, length check 를 하기 위해서는 Validator 를 사용해야 할까

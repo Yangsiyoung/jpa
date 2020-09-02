@@ -2,7 +2,6 @@
 <persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence" version="2.1">
 
     <persistence-unit name="study">
-
         <class>jpabook.start.Member</class>
         <properties>
             <!-- 필수 속성 -->
@@ -18,7 +17,7 @@
             <property name="hibernate.use_sql_comments" value="true" />
 
             <!-- 기본 키 생성 전략 사용 여부(ex. @GeneratedValue IDENTITY, SEQUENCE, TABLE) -->
-            <property name="hibernate.id.new_generator_mappings" value="true" />
+            <property name="hibernate.id.new_generator_mappings" value="true"/>
 
 <!--            <property name="hibernate.ejb.naming_strategy" value="org.hibernate.cfg.ImprovedNamingStrategy"/>-->
             <!-- Hibernate 5 부터는 org.hibernate.boot.model.naming.PhysicalNamingStrategy Interface 를 implements 해야함

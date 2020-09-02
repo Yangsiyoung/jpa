@@ -9,6 +9,7 @@ import java.util.List;
 
 public class JpaMain {
     public static void main(String[] args) {
+
         // 엔티티 매니저 팩토리 생성(설정 파일 읽어오고, JPA 세팅하는 등 생성 비용이 크기 때문에 앱에서 딱 한번만 생성하고 공유해서 사용하자)
         EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("study");
 
@@ -38,6 +39,8 @@ public class JpaMain {
         // 엔티티 매니저 팩토리 종료(앱을 종료할 때)
         entityManagerFactory.close();
 
+
+
     }
 
     private static void logic(EntityManager entityManager) {
@@ -46,7 +49,7 @@ public class JpaMain {
         Integer age = 28;
 
         Member member = new Member();
-        member.setId(id);
+        //member.setId(id); // 기본 키 직접 할당
         member.setUserName(name);
         member.setAge(age);
         member.setRoleType(RoleType.USER);
@@ -54,9 +57,10 @@ public class JpaMain {
         member.setLastModifiedDate(new Date());
 
         entityManager.persist(member);
+
         member.setAge(29);
 
-        Member findMember = entityManager.find(Member.class, id);
+        Member findMember = entityManager.find(Member.class, member.getId());
         System.out.println("findMember = " + findMember.getUserName() + ", age = " + findMember.getAge());
 
         List<Member> members = entityManager.createQuery("SELECT m from Member m", Member.class).getResultList();
