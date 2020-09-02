@@ -4,6 +4,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+import java.util.Date;
 import java.util.List;
 
 public class JpaMain {
@@ -48,6 +49,9 @@ public class JpaMain {
         member.setId(id);
         member.setUserName(name);
         member.setAge(age);
+        member.setRoleType(RoleType.USER);
+        member.setCreatedDate(new Date());
+        member.setLastModifiedDate(new Date());
 
         entityManager.persist(member);
         member.setAge(29);
@@ -58,6 +62,6 @@ public class JpaMain {
         List<Member> members = entityManager.createQuery("SELECT m from Member m", Member.class).getResultList();
         System.out.println("##############" + members.size());
 
-        entityManager.remove(member);
+//        entityManager.remove(member);
     }
 }

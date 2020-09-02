@@ -16,9 +16,16 @@
             <property name="hibernate.show_sql" value="true" />
             <property name="hibernate.format_sql" value="true" />
             <property name="hibernate.use_sql_comments" value="true" />
+
+            <!-- 기본 키 생성 전략 사용 여부(ex. @GeneratedValue IDENTITY, SEQUENCE, TABLE) -->
             <property name="hibernate.id.new_generator_mappings" value="true" />
 
-            <!--<property name="hibernate.hbm2ddl.auto" value="create" />-->
+<!--            <property name="hibernate.ejb.naming_strategy" value="org.hibernate.cfg.ImprovedNamingStrategy"/>-->
+            <!-- Hibernate 5 부터는 org.hibernate.boot.model.naming.PhysicalNamingStrategy Interface 를 implements 해야함
+                org.hibernate.boot.model.naming.ImplicitNamingStrategy Interface 도 있으니 나중에 찾아보자-->
+            <property name="hibernate.physical_naming_strategy" value="jpabook.start.PhysicalNamingStrategyImpl"/>
+
+            <property name="hibernate.hbm2ddl.auto" value="create" />
         </properties>
     </persistence-unit>
 
