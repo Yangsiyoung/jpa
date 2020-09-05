@@ -11,9 +11,9 @@ import java.util.Date;
 @Table(name = "MEMBER"
         , uniqueConstraints = {@UniqueConstraint( name = "NAME_UNIQ", columnNames = {"NAME"})})
 @Entity
-@SequenceGenerator(name = "MEMBER_SEQUENCE_GENERATOR"
-        , sequenceName = "MEMBER_SEQ_IN_DB"
-        , initialValue = 1
+@TableGenerator(name = "MEMBER_SEQUENCE_GENERATOR"
+        , table = "MEMBER_SEQUENCES"
+        , pkColumnValue = "MEMBER_SEQ"
         , allocationSize = 1)
 public class Member {
     //@GeneratedValue(strategy = GenerationType.IDENTITY)
