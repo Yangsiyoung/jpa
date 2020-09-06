@@ -2,7 +2,9 @@
 <persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence" version="2.1">
 
     <persistence-unit name="study">
-        <class>jpabook.start.Member</class>
+        <class>jpabook.start.identifier_strategy.Member</class>
+        <class>jpabook.start.relational_mapping.one_way.many_to_one.Member</class>
+        <class>jpabook.start.relational_mapping.one_way.many_to_one.Team</class>
         <properties>
             <!-- 필수 속성 -->
             <property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>
@@ -22,7 +24,7 @@
 <!--            <property name="hibernate.ejb.naming_strategy" value="org.hibernate.cfg.ImprovedNamingStrategy"/>-->
             <!-- Hibernate 5 부터는 org.hibernate.boot.model.naming.PhysicalNamingStrategy Interface 를 implements 해야함
                 org.hibernate.boot.model.naming.ImplicitNamingStrategy Interface 도 있으니 나중에 찾아보자-->
-            <property name="hibernate.physical_naming_strategy" value="jpabook.start.PhysicalNamingStrategyImpl"/>
+            <property name="hibernate.physical_naming_strategy" value="jpabook.start.identifier_strategy.PhysicalNamingStrategyImpl"/>
 
             <property name="hibernate.hbm2ddl.auto" value="create" />
         </properties>

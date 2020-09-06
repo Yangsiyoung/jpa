@@ -1,4 +1,4 @@
-package jpabook.start;
+package jpabook.start.identifier_strategy;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;

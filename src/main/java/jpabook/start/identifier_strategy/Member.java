@@ -1,4 +1,4 @@
-package jpabook.start;
+package jpabook.start.identifier_strategy;
 
 import lombok.Getter;
 import lombok.Setter;

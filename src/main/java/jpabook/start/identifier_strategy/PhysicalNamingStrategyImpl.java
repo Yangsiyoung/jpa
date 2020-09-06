@@ -1,4 +1,4 @@
-package jpabook.start;
+package jpabook.start.identifier_strategy;
 
 import org.hibernate.boot.model.naming.Identifier;
 import org.hibernate.boot.model.naming.PhysicalNamingStrategy;
