@@ -158,6 +158,98 @@ Table을 만들어줘야하기 때문)
   
    
 ## 4. 단방향 연관관계
-* 다대일(ManyToOne) 단방향 연관관계
+### 1.  다대일(ManyToOne) 단방향 연관관계
+  * 회원과 팀의 경우, 회원의 입장에서 보면 '회원 여러명 - 팀 1개' 로 관계가 생성되므로,
+  회원의 입장에서 다대일(ManyToOne)관계이다.
+  
+  * @ManyToOne  
+  다대일임을 나타내는 어노테이션  
+  회원(다) 객체에서 Team team 이라는 필드가 있고, 이 필드가 회원(Member) 과 팀(Team)의
+  다대일 연관관계를 나타내는 것 임을 나타내는 역할을 함.
+  
+  * @JoinColumn(name="Foreign key")
+  @ManyToOne 어노테이션을 통해 어떤 엔티티와 다대일 관계인지 나타냈다면,
+  해당 엔티티와 매핑해 줄  외래 키 이름을 지정
+  
+  Member.java
+  <pre>
+    <code>
+    @NoArgsConstructor
+    @Setter
+    @Getter
+    @Table(name = "many_to_one_member")
+    @Entity(name = "ManyToOneMember")
+    public class Member {
+    
+        @Column(name = "member_id")
+        // IDENTITY 는 DB의 AUTO INCREMENT 를 사용하므로, persist 시 INSERT 쿼리가 바로 나간다.
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        @Id
+        private Integer id;
+    
+        @Column(name = "user_name")
+        private String userName;
+    
+        /**
+         * 처음 생각
+         * @JoinColumn 을 생략할 수 있다는데, 아마도 변수 타입으로 Team 이라는 Entity 를 들고있고,
+         * 해당 Entity 의 @Id 컬럼을 알 수 있기 때문이 아닐까??
+         *
+         * 자료 내용
+         * @JoinColumn 을 생략하면 외래 키를 찾을 때 기본 전략을 사용한다고 한다,
+         * 기본 전략은 : 필드명 + _ + 참조하는 테이블의 컬럼명
+         * 지금 이 변수에서 기본전략을 적용하면,
+         * 변수명은 team 이며, 테이블의 컬럼명은 Team entity 에 @Id 에 해당하는 column 명은, team_id
+         * 따라서 team_team_id 외래 키를 참조하게 된다고 한다.
+         *
+         * 결국 Team 이라는 Entity 를 들고있으니 어떤 Entity 혹은 Table 을 참조해야하는 지 알 수 있기에,
+         * 기본 전략으로 team_team_id 라는 외래키를 사용할 수 있는 것 같다.
+         */
+        @JoinColumn(name = "team_id")
+        @ManyToOne
+        private Team team;
+    
+        @Override
+        public String toString() {
+            return "Member{" +
+                    "id=" + id +
+                    ", userName='" + userName + '\'' +
+                    ", team=" + team +
+                    '}';
+        }
+    }
+    </code>
+  </pre>
+  
+  Team.java
+  <pre>
+    <code>
+    @NoArgsConstructor
+    @Setter
+    @Getter
+    @Table(name = "many_to_one_team")
+    @Entity(name = "ManyToOneTeam")
+    public class Team {
+    
+        @Column(name = "team_id")
+        // IDENTITY 는 DB의 AUTO INCREMENT 를 사용하므로, persist 시 INSERT 쿼리가 바로 나간다.
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        @Id
+        private Integer id;
+    
+        private String name;
+    
+        @Override
+        public String toString() {
+            return "Team{" +
+                    "id=" + id +
+                    ", name='" + name + '\'' +
+                    '}';
+        }
+    }
+    </code>
+  </pre>
+  
+  
 
 

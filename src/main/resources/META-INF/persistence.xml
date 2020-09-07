@@ -5,6 +5,8 @@
         <class>jpabook.start.identifier_strategy.Member</class>
         <class>jpabook.start.relational_mapping.one_way.many_to_one.Member</class>
         <class>jpabook.start.relational_mapping.one_way.many_to_one.Team</class>
+        <class>jpabook.start.relational_mapping.one_way.one_to_many.Member</class>
+        <class>jpabook.start.relational_mapping.one_way.one_to_many.Team</class>
         <properties>
             <!-- 필수 속성 -->
             <property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>
