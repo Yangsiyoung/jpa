@@ -1,4 +1,4 @@
-package jpabook.start.relational_mapping.one_way.one_to_many;
+package jpabook.start.relational_mapping.bidirectional.one_to_one;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,8 +9,8 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Setter
 @Getter
-@Table(name = "one_way_one_to_many_member")
-@Entity(name = "OneWayOneToManyMember")
+@Table(name = "bidirectional_one_to_one_member")
+@Entity(name = "BidirectionalToOneMember")
 public class Member {
 
     @Column(name = "member_id")
@@ -21,11 +21,16 @@ public class Member {
     @Column(name = "user_name")
     private String userName;
 
+    @JoinColumn(name = "locker_id")
+    @OneToOne
+    private Locker locker;
+
     @Override
     public String toString() {
         return "Member{" +
                 "id=" + id +
                 ", userName='" + userName + '\'' +
+                ", locker=" + locker +
                 '}';
     }
 }

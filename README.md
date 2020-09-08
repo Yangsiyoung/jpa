@@ -250,6 +250,92 @@ Table을 만들어줘야하기 때문)
     </code>
   </pre>
   
+  ### 2. 일대다(OneToMany) 단방향 연관관계
+  * 주로 사용할 것 같지 않으므로 필요할 때 공부하도록 하겠다.
   
+  ### 3. 일대일(OneToOne) 단방향 연관관계
+  * 주 테이블이나 대상 테이블 둘 중 어느 테이블이나 외래 키를 가질 수 있다.  
+    (ManyToOne, OneToMany 에서 Many 쪽 테이블이 외래 키를 가지는 특성과 대비된다.)
+    
+  Member.java
+  <pre>
+    <code>
+    @NoArgsConstructor
+         @Setter
+         @Getter
+         @Table(name = "one_way_one_to_one_member")
+         @Entity(name = "OneWayOneToOneMember")
+         public class Member {
+         
+             @Column(name = "member_id")
+             @GeneratedValue(strategy = GenerationType.IDENTITY)
+             @Id
+             private Integer id;
+         
+             @Column(name = "user_name")
+             private String userName;
+         
+             @JoinColumn(name = "locker_id")
+             @OneToOne
+             private Locker locker;
+         
+             @Override
+             public String toString() {
+                 return "Member{" +
+                         "id=" + id +
+                         ", userName='" + userName + '\'' +
+                         ", locker=" + locker +
+                         '}';
+             }
+         }    
+    </code>
+  </pre>
+  
+  Locker.java
+  <pre>
+     <code>
+     @NoArgsConstructor
+     @Setter
+     @Getter
+     @Table(name = "one_way_one_to_one_locker")
+     @Entity(name = "OneWayOneToOneLocker")
+     public class Locker {
+     
+         @Column(name = "locker_id")
+         @GeneratedValue(strategy = GenerationType.IDENTITY)
+         @Id
+         private Integer id;
+     
+         private String name;
+     
+         @Override
+         public String toString() {
+             return "Locker{" +
+                     "id=" + id +
+                     ", name='" + name + '\'' +
+                     '}';
+         }
+     }
+     </code>
+  </pre>
+    
+## 5. 양방향 연관관계
+양방향 연관관계의 경우 관리 Point 가 늘어나기 때문에 필요할 때 공부해서 사용하도록 하겠다.
+
+## 6. 다양한 매핑
+### 1. 상속 관계 매핑
+Item 이라는 부모 타입의 테이블이 있고, Album, Movie, Book 이라는 자식 타입의 상품  
+테이블이 있다면 공통 속성을 부모 테이블이 가지고있고 각 상품의 특징에 해당하는 속성은  
+테이블 별로 가져야 할 것이다.  
+
+이런 상속 관계를 매핑하는 방법에 대해 알아보도록 하자.
+
+* 조인 전략(각각의 테이블로 변환)
+Entity 별로 테이블을 만들고 자식 테이블이 부모 테이블의 기본 키(식별자)를  
+기본 키이자 외래 키로 사용하는 것이다.
+
+* 단일 테이블 전략(통합 테이블로 변환)
+
+* 구현 클래스마다 테이블 전략(서브타입 테이블로 변환)
 
 

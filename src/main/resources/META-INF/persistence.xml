@@ -5,8 +5,36 @@
         <class>jpabook.start.identifier_strategy.Member</class>
         <class>jpabook.start.relational_mapping.one_way.many_to_one.Member</class>
         <class>jpabook.start.relational_mapping.one_way.many_to_one.Team</class>
+
+        <class>jpabook.start.relational_mapping.bidirectional.many_to_one.Member</class>
+        <class>jpabook.start.relational_mapping.bidirectional.many_to_one.Team</class>
+        <class>jpabook.start.relational_mapping.bidirectional.one_to_one.Member</class>
+        <class>jpabook.start.relational_mapping.bidirectional.one_to_one.Locker</class>
+
         <class>jpabook.start.relational_mapping.one_way.one_to_many.Member</class>
         <class>jpabook.start.relational_mapping.one_way.one_to_many.Team</class>
+        <class>jpabook.start.relational_mapping.one_way.one_to_one.Member</class>
+        <class>jpabook.start.relational_mapping.one_way.one_to_one.Locker</class>
+
+<!--        <class>jpabook.start.mapping.join_strategy.Item</class>-->
+        <class>jpabook.start.mapping.join_strategy.Album</class>
+        <class>jpabook.start.mapping.join_strategy.Movie</class>
+        <class>jpabook.start.mapping.join_strategy.Book</class>
+
+        <!--        <class>jpabook.start.mapping.single_table_strategy.Item</class>-->
+        <class>jpabook.start.mapping.single_table_strategy.Album</class>
+        <class>jpabook.start.mapping.single_table_strategy.Movie</class>
+        <class>jpabook.start.mapping.single_table_strategy.Book</class>
+
+        <!--        <class>jpabook.start.mapping.table_per_concrete_class_strategy.Item</class>-->
+        <class>jpabook.start.mapping.table_per_concrete_class_strategy.Album</class>
+        <class>jpabook.start.mapping.table_per_concrete_class_strategy.Movie</class>
+        <class>jpabook.start.mapping.table_per_concrete_class_strategy.Book</class>
+
+        <class>jpabook.start.mapping.mapped_super_class.Member</class>
+        <class>jpabook.start.mapping.mapped_super_class.Seller</class>
+
+
         <properties>
             <!-- 필수 속성 -->
             <property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>
