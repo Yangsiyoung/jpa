@@ -34,6 +34,12 @@
         <class>jpabook.start.mapping.mapped_super_class.Member</class>
         <class>jpabook.start.mapping.mapped_super_class.Seller</class>
 
+        <class>jpabook.start.mapping.composite_key.id_class.Parent</class>
+        <class>jpabook.start.mapping.composite_key.id_class.Child</class>
+
+        <class>jpabook.start.mapping.composite_key.embedded_id.Parent</class>
+        <class>jpabook.start.mapping.composite_key.embedded_id.Child</class>
+
 
         <properties>
             <!-- 필수 속성 -->

@@ -261,33 +261,33 @@ Table을 만들어줘야하기 때문)
   <pre>
     <code>
     @NoArgsConstructor
-         @Setter
-         @Getter
-         @Table(name = "one_way_one_to_one_member")
-         @Entity(name = "OneWayOneToOneMember")
-         public class Member {
-         
-             @Column(name = "member_id")
-             @GeneratedValue(strategy = GenerationType.IDENTITY)
-             @Id
-             private Integer id;
-         
-             @Column(name = "user_name")
-             private String userName;
-         
-             @JoinColumn(name = "locker_id")
-             @OneToOne
-             private Locker locker;
-         
-             @Override
-             public String toString() {
-                 return "Member{" +
-                         "id=" + id +
-                         ", userName='" + userName + '\'' +
-                         ", locker=" + locker +
-                         '}';
-             }
-         }    
+    @Setter
+    @Getter
+    @Table(name = "one_way_one_to_one_member")
+    @Entity(name = "OneWayOneToOneMember")
+    public class Member {
+     
+        @Column(name = "member_id")
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        @Id
+        private Integer id;
+     
+        @Column(name = "user_name")
+        private String userName;
+     
+        @JoinColumn(name = "locker_id")
+        @OneToOne
+        private Locker locker;
+     
+        @Override
+        public String toString() {
+            return "Member{" +
+                    "id=" + id +
+                    ", userName='" + userName + '\'' +
+                    ", locker=" + locker +
+                    '}';
+        }
+    }    
     </code>
   </pre>
   
@@ -332,7 +332,7 @@ Item 이라는 부모 타입의 테이블이 있고, Album, Movie, Book 이라�
 
 이런 상속 관계를 매핑하는 방법에 대해 알아보도록 하자.
 
-* 조인 전략(각각의 테이블로 변환)
+* #### 1. 조인 전략(각각의 테이블로 변환)
 Entity 별로 테이블을 만들고 자식 테이블이 부모 테이블의 기본 키(식별자)를  
 기본 키이자 외래 키로 사용하는 것이다.  
 
@@ -464,7 +464,7 @@ Entity 별로 테이블을 만들고 자식 테이블이 부모 테이블의 기
     </code>
   </pre>
   
-* 단일 테이블 전략(통합 테이블로 변환)
+* #### 2. 단일 테이블 전략(통합 테이블로 변환)
   부모 자식 테이블을 모두 합쳐 한 테이블로 관리하는 것
   DB 테이블 구조
 
@@ -594,7 +594,7 @@ Entity 별로 테이블을 만들고 자식 테이블이 부모 테이블의 기
       </code>
   </pre>
 
-* 구현 클래스마다 테이블 전략(서브타입 테이블로 변환)
+* #### 3. 구현 클래스마다 테이블 전략(서브타입 테이블로 변환)
   부모 테이블의 속성을 가진 각각의 자식 테이블로 관리하는 것  
   DB 테이블 구조
 
@@ -724,4 +724,146 @@ Entity 별로 테이블을 만들고 자식 테이블이 부모 테이블의 기
         }
         </code>
     </pre>
+
+### 2. 매핑 정보만 상속해서 사용하기(@MappedSuperclass)
+부모 클래스와 자식 클래스를 DB Table 과 매핑하여 사용하던 상속관계와는 달리  
+공통 속성(등록일자, 수정일자, 등록자 등)을 정의하고 매핑 정보만 상속할 목적으로 사용
+
+BaseEntity.java
+<pre>
+    <code>
+    @Setter
+    @Getter
+    /**
+     * 상속 관계 매핑은 아니며, 등록일자, 수정일자, 등록자 같이 여러 Entity 에서 공통으로 사용되는 속성을
+     * 정의해두고 상속만 받아 사용하는 방식이다.
+     *
+     * 즉, 매핑 정보를 상속할 목적으로 사용하지 상속 관계 매핑처럼 부모 Entity 를 만들어 DB 의 Table 화를 하는 등
+     * Entity 로서 사용하지 않는다.
+     * (@Entity 어노테이션이 없는 것을 확인할 수 있다.)
+     *
+     */
+    @MappedSuperclass
+    public abstract class BaseEntity {
+    
+        @Column(name = "base_id")
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        @Id
+        protected Integer id;
+    
+        protected String name;
+    }
+    </code>
+</pre>
+
+Member.java
+<pre>
+    <code>
+    @NoArgsConstructor
+    @Setter
+    @Getter
+    /**
+     * 혹시나 @MappedSuperclass 클래스에 선언된 속성 중
+     * 특정 Entity 와 연관된 테이블에서의 명이 다른 경우
+     * @AttributeOverrides - @AttributeOverride 를 사용해서 재정의 할 수 있다.
+     *
+     * 내 생각엔 등록일자, 수정일자, 등록자 같이 여러 Entity 에서 공통으로 사용되는 속성을 @MappedSuperclass 클래스에 정의해두고
+     * 사용하려하는데 실제 몇몇 Table 에 등록일자, 수정일자, 등록자 관련 컬럼명이 Table 마다 다를 경우에 사용하면 좋을 것 같다.
+     * (ex. 다른 Table 에서는 수정일자를 UPDATE_DATE 로 사용하고 있어서 @MappedSuperclass 의 속성에도
+     * 수정일자 관련 컬럼을 UPDATE_DATE 로 설정해두었으나, 어떤 TABLE 에서 수정일자를 MODIFY_DATE 로 사용해서
+     * MODIFY_DATE 로 사용하고 있는 테이블과 연관된 Entity 에 아래와 같이 설정하는 것처럼...
+     *
+     *      @AttributeOverrides({
+     *              // name : @MappedSuperclass 에 정의된 프로퍼티 명, column : 현재 Entity 와 관련된 Table 의 어떤 컬럼에 매칭할 지
+     *              @AttributeOverride(name = "updateDate", column = @Column(name = "MODIFY_DATE"))
+     *      })
+     *
+     * )
+     *
+     *
+     *
+     */
+    @AttributeOverrides({
+            // name : @MappedSuperclass 에 정의된 프로퍼티 명, column : 현재 Entity 와 관련된 Table 의 어떤 컬럼에 매칭할 지
+            @AttributeOverride(name = "id", column = @Column(name = "member_id"))
+    })
+    @Table(name = "mapped_super_class_member")
+    @Entity(name = "MappedSuperClassMember")
+    public class Member extends BaseEntity {
+    
+        private String email;
+    
+        @Override
+        public String toString() {
+            return "Member{" +
+                    "email='" + email + '\'' +
+                    ", id=" + id +
+                    ", name='" + name + '\'' +
+                    '}';
+        }
+    }
+    </code>
+</pre>
+
+Seller.java
+<pre>
+    <code>
+    @NoArgsConstructor
+    @Setter
+    @Getter
+    @Table(name = "mapped_super_class_seller")
+    @Entity(name = "MappedSuperClassSeller")
+    public class Seller extends BaseEntity {
+    
+        @Column(name = "shop_name")
+        private String shopName;
+    
+        @Override
+        public String toString() {
+            return "Seller{" +
+                    "shopName='" + shopName + '\'' +
+                    ", id=" + id +
+                    ", name='" + name + '\'' +
+                    '}';
+        }
+    }
+    </code>
+</pre>
+
+### 3. 복합 키와 식별 관계 매핑
+
+* 복합 키  
+기존의 기본 키에 해당하는 컬럼 하나를 사용해서 식별자로 사용했다면,  
+두개 이상의 컬럼을 합쳐야 기본 키의 역할을 할 수 있을 때가 있다.  
+이렇게 두개 이상의 컬럼을 묶어서 식별자로 사용하는 것을  
+복합 키 라고 한다.
+
+#### 1. 식별 관계
+부모 테이블의 기본 키(식별자)를 자식 테이블의 기본 키(식별자) + 외래 키로 사용하는 관계
+
+#### 2. 비식별 관계
+부모 테이블의 기본 키(식별자)를 자식 테이블의 외래 키로만 사용하는 관계  
+자식 테이블의 기본 키(식별자)는 자식 테이블에서 직접 관리
+
+* 필수적 비식별 관계
+외래 키 NULL 허용 X(모든 데이터가 부모 테이블과 연관관계가 있음)
+
+* 선택적 비식별 관계
+외래 키 NULL 허용 O(각각의 데이터들은 부모 테이블과 연관관계가 있을수도 없을수도 있음)
+
+#### 3. 복합 키 - 비식별 관계 매핑
+JPA 는 Persistence Context 에 Entity 를 보관할 때 Entity 의 식별자를 키로 사용한다.  
+(Map 에서 Key 를 기반으로 Value 를 찾듯)  
+
+식별자(기본 키) 필드가 2개 이상이면 별도의 식별자 클래스를 만들어 해당 클래스의  
+equals(), hashCode() 메서드를 구현해야한다.  
+(식별자 필드가 2개 이상이기에 식별자 클래스를 만들어 해당 클래스의  
+hashCode 를 Persistence Context 의 Entity key 로 사용하고  
+equals() 연산으로 같은 식별자인지 확인하기 위해서가 아닐까?)
+
+* @IdClass
+
+* @EmbeddedId
+
+#### 4. 복합 키 - 식별 관계 매핑
 
