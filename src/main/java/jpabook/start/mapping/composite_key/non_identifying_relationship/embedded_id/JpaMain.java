@@ -1,4 +1,4 @@
-package jpabook.start.mapping.composite_key.embedded_id;
+package jpabook.start.mapping.composite_key.non_identifying_relationship.embedded_id;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;

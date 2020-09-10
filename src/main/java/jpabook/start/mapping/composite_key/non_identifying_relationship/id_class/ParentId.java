@@ -1,4 +1,4 @@
-package jpabook.start.mapping.composite_key.id_class;
+package jpabook.start.mapping.composite_key.non_identifying_relationship.id_class;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- * 식별자 클래스로 사용할 클래스는
+ * @IdClass 식별자 클래스로 사용할 클래스는
  * 1. 식별자 클래스의 변수명과 Entity 에서 사용하는 변수명이 일치해야한다.
  * 2. Serializable 인터페이스를 implements 해야한다.
  * 3. equals(), hashCode() 를 구현해야 한다.

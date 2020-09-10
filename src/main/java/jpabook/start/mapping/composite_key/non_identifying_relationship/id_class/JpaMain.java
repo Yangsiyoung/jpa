@@ -1,4 +1,4 @@
-package jpabook.start.mapping.composite_key.id_class;
+package jpabook.start.mapping.composite_key.non_identifying_relationship.id_class;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -38,7 +38,7 @@ public class JpaMain {
             /**
              * Parent findParent2 = entityManager.find(Parent.class, parent1.getParentId1());
              * 위와 같이 ParentId 식별자 클래스를 사용하지 않고 복합 키 컬럼 중 하나로 조회를 시도하면 아래와 같은 에러가 발생한다.
-             * java.lang.IllegalArgumentException: Provided id of the wrong type for class jpabook.start.mapping.composite_key.id_class.Parent. Expected: class jpabook.start.mapping.composite_key.id_class.ParentId, got class java.lang.String
+             * java.lang.IllegalArgumentException: Provided id of the wrong type for class jpabook.start.mapping.composite_key.non_identifying_relationship.id_class.Parent. Expected: class jpabook.start.mapping.composite_key.non_identifying_relationship.id_class.ParentId, got class java.lang.String
              */
 
             Child child1 = new Child();

@@ -1,4 +1,4 @@
-package jpabook.start.mapping.composite_key.embedded_id;
+package jpabook.start.mapping.composite_key.non_identifying_relationship.embedded_id;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -15,6 +15,12 @@ import java.util.Objects;
  * 이 식별자 클래스에 있는 컬럼을 바로 사용한다.
  * (@IdClass 에서는 부모 Entity 에 있는 변수 명과 @IdClass 로 사용 할 식별자 클래스의 변수 명이
  * 일치해야하던 것돠 대비된다.)
+ *
+ * 1. @Embeddable 어노테이션을 붙여줘야한다.
+ * 2. Serializable Interface 를 implements 해야한다.
+ * 3. equals(), hashCode() 를 구현해야한다.
+ * 4. 기본 생성자가 있어야 한다.
+ * 5. public class 여야 한다.
  */
 @Setter
 @Getter

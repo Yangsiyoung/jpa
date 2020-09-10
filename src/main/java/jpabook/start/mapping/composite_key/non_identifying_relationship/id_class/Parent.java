@@ -1,4 +1,4 @@
-package jpabook.start.mapping.composite_key.id_class;
+package jpabook.start.mapping.composite_key.non_identifying_relationship.id_class;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

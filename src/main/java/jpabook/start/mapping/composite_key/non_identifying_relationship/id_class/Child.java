@@ -1,4 +1,4 @@
-package jpabook.start.mapping.composite_key.embedded_id;
+package jpabook.start.mapping.composite_key.non_identifying_relationship.id_class;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,16 +9,18 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Setter
 @Getter
-@Table(name = "embedded_id_child")
-@Entity(name = "EmbeddedIdChild")
+@Table(name = "id_class_child")
+@Entity(name = "IdClassChild")
 public class Child {
 
-    @Column(name = "child_id")
+    @Column(name = "chlid_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private Integer id;
 
-    @JoinColumns({
+    @ManyToOne
+    @JoinColumns(
+            {
             /**
              * name : Child Table 에 있는 컬럼 명, referencedColumnName : Parent Table 에 있는 컬럼 명
              * 부모 테이블에 있는 복합 키로 사용되는 컬럼명들과 자식 테이블에 외래 키로 사용될 키들의 컬럼명이 다를 경우
@@ -26,8 +28,8 @@ public class Child {
              */
             @JoinColumn(name = "CHILD_PARENT_ID_1", referencedColumnName = "PARENT_ID_1")
             , @JoinColumn(name = "CHILD_PARENT_ID_2", referencedColumnName = "PARENT_ID_2")
-    })
-    @ManyToOne
+            }
+    )
     private Parent parent;
 
     private String name;

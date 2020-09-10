@@ -1,6 +1,9 @@
 JPA 정리
 ==========
 
+참고 자료  
+강의 : https://www.inflearn.com/course/ORM-JPA-Basic  
+서적 : 자바 ORM 표준 JPA 프로그래밍 - 지은이 : 김영한
 # 1. 기본 키(식별자) 할당 전략
 ## 1. 직접 할당 전략
 <pre>
@@ -144,7 +147,7 @@ Table을 만들어줘야하기 때문)
   
 ## 3. 객체 - 테이블
   회원이라는 객체(Member.java)는 MEMBER 라는 이름의 table 로 관리하고 있고,
-  팀이라는 객체(Team.java)는 Team 이라는 이름의 Table 로 관리하고 있다.
+  팀이라는 객체(Team.java)는 TEAM 이라는 이름의 Table 로 관리하고 있다.
   
   회원과 팀의 객체끼리는 변수를 통한 참조로 연관관계를 맺고,
   회원과 팀의 Table 끼리는 외래 키를 통해 연관관계를 맺는다.
@@ -861,9 +864,255 @@ equals(), hashCode() 메서드를 구현해야한다.
 hashCode 를 Persistence Context 의 Entity key 로 사용하고  
 equals() 연산으로 같은 식별자인지 확인하기 위해서가 아닐까?)
 
+복합 키 - 비식별 관계 매핑을 위해 아래 2가지 방법 중 자신에게 맞는 방법을 사용하면 된다.
+
+참고로 복합 키에는 @GeneratedValue 를 사용할 수 없으며, 복합 키를 구성하는 컬럼 중 어떤 하나에도  
+사용할 수 없다.
+
 * @IdClass
 
+ParentId.java
+<pre>
+    <code>
+    /**
+     * @IdClass 식별자 클래스로 사용할 클래스는
+     * 1. 식별자 클래스의 변수명과 Entity 에서 사용하는 변수명이 일치해야한다.
+     * 2. Serializable 인터페이스를 implements 해야한다.
+     * 3. equals(), hashCode() 를 구현해야 한다.
+     * 4. 기본 생성자가 있어야 한다.
+     * 5. public class 여야 한다.
+     */
+    @NoArgsConstructor
+    @Setter
+    @Getter
+    public class ParentId implements Serializable {
+    
+        private String parentId1;
+        private String parentId2;
+    
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            ParentId parentId = (ParentId) o;
+            return Objects.equals(parentId1, parentId.parentId1) &&
+                    Objects.equals(parentId2, parentId.parentId2);
+        }
+    
+        @Override
+        public int hashCode() {
+            return Objects.hash(parentId1, parentId2);
+        }
+    }
+    </code>
+</pre>
+
+Parent.java
+<pre>
+    <code>
+    @NoArgsConstructor
+    @Setter
+    @Getter
+    // 복합 키를 지정한 식별자 클래스를 알려 줌
+    @IdClass(ParentId.class)
+    @Table(name = "id_class_parent")
+    @Entity(name = "IdClassParent")
+    public class Parent {
+    
+        @Column(name = "parent_id_1")
+        @Id
+        private String parentId1;
+    
+        @Column(name = "parent_id_2")
+        @Id
+        private String parentId2;
+    
+        private String name;
+    
+        @Override
+        public String toString() {
+            return "Parent{" +
+                    "parentId1='" + parentId1 + '\'' +
+                    ", parentId2='" + parentId2 + '\'' +
+                    ", name='" + name + '\'' +
+                    '}';
+        }
+    }
+    </code>
+</pre>
+
+Child.java
+<pre>
+    <code>
+    @NoArgsConstructor
+    @Setter
+    @Getter
+    @Table(name = "id_class_child")
+    @Entity(name = "IdClassChild")
+    public class Child {
+    
+        @Column(name = "chlid_id")
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        @Id
+        private Integer id;
+    
+        @ManyToOne
+        @JoinColumns(
+                {
+                /**
+                 * name : Child Table 에 있는 컬럼 명, referencedColumnName : Parent Table 에 있는 컬럼 명
+                 * 부모 테이블에 있는 복합 키로 사용되는 컬럼명들과 자식 테이블에 외래 키로 사용될 키들의 컬럼명이 다를 경우
+                 * referencedColumnName 로 따로 부모 테이블의 복합 키 관련 컬럼명들을 지정해준다.
+                 */
+                @JoinColumn(name = "CHILD_PARENT_ID_1", referencedColumnName = "PARENT_ID_1")
+                , @JoinColumn(name = "CHILD_PARENT_ID_2", referencedColumnName = "PARENT_ID_2")
+                }
+        )
+        private Parent parent;
+    
+        private String name;
+    
+        @Override
+        public String toString() {
+            return "Child{" +
+                    "id=" + id +
+                    ", parent=" + parent +
+                    ", name='" + name + '\'' +
+                    '}';
+        }
+    }
+    </code>
+</pre>
+
 * @EmbeddedId
+
+ParentId.java
+<pre>
+    <code>
+    /**
+     * @IdClass 로 설정해 사용하던 식별자 클래스와는 다르게
+     * @Embeddable 어노테이션이 붙어있으며
+     *
+     * 이 식별자 클래스에 있는 컬럼을 바로 사용한다.
+     * (@IdClass 에서는 부모 Entity 에 있는 변수 명과 @IdClass 로 사용 할 식별자 클래스의 변수 명이
+     * 일치해야하던 것돠 대비된다.)
+     *
+     * 1. @Embeddable 어노테이션을 붙여줘야한다.
+     * 2. Serializable Interface 를 implements 해야한다.
+     * 3. equals(), hashCode() 를 구현해야한다.
+     * 4. 기본 생성자가 있어야 한다.
+     * 5. public class 여야 한다.
+     */
+    @Setter
+    @Getter
+    @Embeddable
+    public class ParentId implements Serializable {
+    
+        @Column(name = "parent_id_1")
+        private String parentId1;
+    
+        @Column(name = "parent_id_2")
+        private String parentId2;
+    
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            ParentId parentId = (ParentId) o;
+            return Objects.equals(parentId1, parentId.parentId1) &&
+                    Objects.equals(parentId2, parentId.parentId2);
+        }
+    
+        @Override
+        public int hashCode() {
+            return Objects.hash(parentId1, parentId2);
+        }
+    
+        /**
+         * @IdClass 를 사용할 때엔 부모 Entity 에 복합 키 관련 변수가 있어서 부모 Entity 에 toString 을 구현하면 되었지만
+         * @EmbeddedId 를 사용하면 부모 Entity 에서 복합 키로 설정한 부모 Entity 변수에 @EmbeddedId 로 설정한
+         * @Embeddable 로 설정하고 객체를 가져다 복합 키로 사용하기 때문에
+         *
+         * 복합 키에 해당하는  @Embeddable 클래스에 이와 같이 toString() 을 정의해줬다.
+         */
+        @Override
+        public String toString() {
+            return "ParentId{" +
+                    "parentId1='" + parentId1 + '\'' +
+                    ", parentId2='" + parentId2 + '\'' +
+                    '}';
+        }
+    }
+    </code>
+</pre>
+
+Parent.java
+<pre>
+    <code>
+    @NoArgsConstructor
+    @Setter
+    @Getter
+    @Table(name = "embedded_id_parent")
+    @Entity(name = "EmbeddedIdParent")
+    public class Parent {
+    
+        // @Embeddable 로 설정된 식별자 클래스임을 나타냄
+        @EmbeddedId
+        private ParentId id;
+    
+        private String name;
+    
+        @Override
+        public String toString() {
+            return "Parent{" +
+                    "id=" + id +
+                    ", name='" + name + '\'' +
+                    '}';
+        }
+    }
+    </code>
+</pre>
+
+Child.java
+<pre>
+    <code>
+    @NoArgsConstructor
+    @Setter
+    @Getter
+    @Table(name = "embedded_id_child")
+    @Entity(name = "EmbeddedIdChild")
+    public class Child {
+    
+        @Column(name = "child_id")
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        @Id
+        private Integer id;
+    
+        @JoinColumns({
+                /**
+                 * name : Child Table 에 있는 컬럼 명, referencedColumnName : Parent Table 에 있는 컬럼 명
+                 * 부모 테이블에 있는 복합 키로 사용되는 컬럼명들과 자식 테이블에 외래 키로 사용될 키들의 컬럼명이 다를 경우
+                 * referencedColumnName 로 따로 부모 테이블의 복합 키 관련 컬럼명들을 지정해준다.
+                 */
+                @JoinColumn(name = "CHILD_PARENT_ID_1", referencedColumnName = "PARENT_ID_1")
+                , @JoinColumn(name = "CHILD_PARENT_ID_2", referencedColumnName = "PARENT_ID_2")
+        })
+        @ManyToOne
+        private Parent parent;
+    
+        private String name;
+    
+        @Override
+        public String toString() {
+            return "Child{" +
+                    "id=" + id +
+                    ", parent=" + parent +
+                    ", name='" + name + '\'' +
+                    '}';
+        }
+    }
+    </code>
+</pre>
 
 #### 4. 복합 키 - 식별 관계 매핑
 

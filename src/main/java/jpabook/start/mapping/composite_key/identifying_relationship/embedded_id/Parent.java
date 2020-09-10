@@ -1,30 +1,31 @@
-package jpabook.start.mapping.composite_key.embedded_id;
+package jpabook.start.mapping.composite_key.identifying_relationship.embedded_id;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.EmbeddedId;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.Table;
 
 @NoArgsConstructor
 @Setter
 @Getter
-@Table(name = "embedded_id_parent")
-@Entity(name = "EmbeddedIdParent")
+@Table(name = "identifying_relationship_embedded_id_parent")
+@Entity(name = "IndentifyingRelationshipEmbeddedIdParent")
 public class Parent {
 
-    // @Embeddable 로 설정된 식별자 클래스임을 나타냄
-    @EmbeddedId
-    private ParentId id;
+    @Column(name = "parent_id")
+    @Id
+    private String id;
 
     private String name;
 
     @Override
     public String toString() {
         return "Parent{" +
-                "id=" + id +
+                "id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 '}';
     }
