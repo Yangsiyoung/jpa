@@ -869,6 +869,14 @@ equals() 연산으로 같은 식별자인지 확인하기 위해서가 아닐까
 참고로 복합 키에는 @GeneratedValue 를 사용할 수 없으며, 복합 키를 구성하는 컬럼 중 어떤 하나에도  
 사용할 수 없다.
 
+* Table  
+parent
+<img width="401" alt="스크린샷 2020-09-09 오후 4 55 22" src="https://user-images.githubusercontent.com/8858991/92694847-99cf0200-f382-11ea-94b2-d70142663369.png">
+child
+<img width="397" alt="스크린샷 2020-09-09 오후 4 55 30" src="https://user-images.githubusercontent.com/8858991/92694852-9b98c580-f382-11ea-9981-a1353783eec5.png">
+grand_child
+<img width="598" alt="스크린샷 2020-09-09 오후 4 55 38" src="https://user-images.githubusercontent.com/8858991/92694857-9c315c00-f382-11ea-81be-06dd0c23fb58.png">
+
 * @IdClass
 
 ParentId.java
@@ -1115,4 +1123,368 @@ Child.java
 </pre>
 
 #### 4. 복합 키 - 식별 관계 매핑
+복합 키 - 식별관계의 경우 부모 - 자식 - 손자 Table 까지 기본 키를 계속해서 전달하는 식별 관계다.  
+자식 Table 은 부모 Table 의 기본 키를 포함해서 복합 키를 구성해나가며,  
+부모 Table 의 기본 키를 복합 키 이자 외래 키 로 사용하게 된다.
 
+* Table  
+parent
+<img width="433" alt="스크린샷 2020-09-09 오후 4 55 56" src="https://user-images.githubusercontent.com/8858991/92694862-9cc9f280-f382-11ea-8638-590ff3332a95.png">
+child
+<img width="419" alt="스크린샷 2020-09-09 오후 4 56 07" src="https://user-images.githubusercontent.com/8858991/92694863-9d628900-f382-11ea-8c1f-0203482c5755.png">
+grand_child
+<img width="589" alt="스크린샷 2020-09-09 오후 4 56 18" src="https://user-images.githubusercontent.com/8858991/92694866-9dfb1f80-f382-11ea-8a0b-6fc5dc0b66d7.png">
+
+* @ClassId
+
+Parent.java
+<pre>
+    <code>
+    @NoArgsConstructor
+    @Setter
+    @Getter
+    @Table(name = "identifying_relationship_id_class_parent")
+    @Entity(name = "IdentifyingRelationshipIdClassParent")
+    public class Parent {
+    
+        @Column(name = "parent_id")
+        @Id
+        private String parentId;
+    
+        private String name;
+    
+        @Override
+        public String toString() {
+            return "Parent{" +
+                    "parentId='" + parentId + '\'' +
+                    ", name='" + name + '\'' +
+                    '}';
+        }
+    }
+    </code>
+</pre>
+
+ChildId.java
+<pre>
+    <code>
+    @NoArgsConstructor
+    @Setter
+    @Getter
+    public class ChildId implements Serializable {
+    
+        // Parent 의 기본 키(식별자) 타입이 String 이고, ChildId 를 식별자 클래스로 사용할 Child Entity 의 Parent 연관관계 변수명이 parent
+        private String parent;
+        private String childId;
+    
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            ChildId childId1 = (ChildId) o;
+            return Objects.equals(parent, childId1.parent) &&
+                    Objects.equals(childId, childId1.childId);
+        }
+    
+        @Override
+        public int hashCode() {
+            return Objects.hash(parent, childId);
+        }
+    
+        @Override
+        public String toString() {
+            return "ChildId{" +
+                    "parent='" + parent + '\'' +
+                    ", childId='" + childId + '\'' +
+                    '}';
+        }
+    }
+    </code>
+</pre>
+
+Child.java
+<pre>
+    <code>
+    @NoArgsConstructor
+    @Setter
+    @Getter
+    @IdClass(ChildId.class)
+    @Table(name = "identifying_relationship_id_class_child")
+    @Entity(name = "IdentifyingRelationshipIdClassChild")
+    public class Child {
+    
+        @Column(name = "child_id")
+        @Id
+        private String childId;
+    
+        @JoinColumn(name = "child_parent_id")
+        @ManyToOne
+        @Id
+        private Parent parent;
+    
+        private String name;
+    
+        @Override
+        public String toString() {
+            return "Child{" +
+                    "childId='" + childId + '\'' +
+                    ", parent=" + parent +
+                    ", name='" + name + '\'' +
+                    '}';
+        }
+    }
+    </code>
+</pre>
+
+GrandChildId.java
+<pre>
+    <code>
+    @NoArgsConstructor
+    @Setter
+    @Getter
+    public class GrandChildId implements Serializable {
+    
+        private ChildId child;
+        private String grandChildId;
+    
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            GrandChildId that = (GrandChildId) o;
+            return Objects.equals(child, that.child) &&
+                    Objects.equals(grandChildId, that.grandChildId);
+        }
+    
+        @Override
+        public int hashCode() {
+            return Objects.hash(child, grandChildId);
+        }
+    
+        @Override
+        public String toString() {
+            return "GrandChildId{" +
+                    "child=" + child +
+                    ", grandChildId='" + grandChildId + '\'' +
+                    '}';
+        }
+    }
+    </code>
+</pre>
+
+GrandChild.java
+<pre>
+    <code>
+    @NoArgsConstructor
+    @Setter
+    @Getter
+    @IdClass(GrandChildId.class)
+    @Table(name = "identifying_relationship_id_class_grand_child")
+    @Entity(name = "IdentifyingRelationshipIdClassGrandChild")
+    public class GrandChild {
+    
+        @Column(name = "grand_child_id")
+        @Id
+        private String grandChildId;
+    
+        @JoinColumns(
+                {
+                        @JoinColumn(name = "grand_child_grand_parent_id", referencedColumnName = "child_parent_id")
+                        , @JoinColumn(name = "grand_child_parent_id", referencedColumnName = "child_id")
+                }
+        )
+        @ManyToOne
+        @Id
+        private Child child;
+    
+        private String name;
+    
+        @Override
+        public String toString() {
+            return "GrandChild{" +
+                    "grandChildId='" + grandChildId + '\'' +
+                    ", child=" + child +
+                    ", name='" + name + '\'' +
+                    '}';
+        }
+    }
+    </code>
+</pre>
+
+* @EmbeddedId
+Parent.java
+<pre>
+    <code>
+    @NoArgsConstructor
+    @Setter
+    @Getter
+    @Table(name = "identifying_relationship_embedded_id_parent")
+    @Entity(name = "IndentifyingRelationshipEmbeddedIdParent")
+    public class Parent {
+    
+        @Column(name = "parent_id")
+        @Id
+        private String id;
+    
+        private String name;
+    
+        @Override
+        public String toString() {
+            return "Parent{" +
+                    "id='" + id + '\'' +
+                    ", name='" + name + '\'' +
+                    '}';
+        }
+    }
+    </code>
+</pre>
+
+ChildId.java
+<pre>
+    <code>
+    @NoArgsConstructor
+    @Setter
+    @Getter
+    @Embeddable
+    public class ChildId implements Serializable {
+    
+        // Child Entity @MapsId("parentId") 와 매핑됨
+        @Column(name = "child_parent_id")
+        private String parentId;
+    
+        @Column(name = "child_id")
+        private String childId;
+    
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            ChildId childId1 = (ChildId) o;
+            return Objects.equals(parentId, childId1.parentId) &&
+                    Objects.equals(childId, childId1.childId);
+        }
+    
+        @Override
+        public int hashCode() {
+            return Objects.hash(parentId, childId);
+        }
+    
+        @Override
+        public String toString() {
+            return "ChildId{" +
+                    "parentId='" + parentId + '\'' +
+                    ", childId='" + childId + '\'' +
+                    '}';
+        }
+    }
+    </code>
+</pre>
+
+Child.java
+<pre>
+    <code>
+    @NoArgsConstructor
+    @Setter
+    @Getter
+    @Table(name = "identifying_relationship_embedded_id_child")
+    @Entity(name = "IdentifyingRelationshipEmbeddedIdChild")
+    public class Child {
+    
+        @EmbeddedId
+        private ChildId childId;
+    
+        // 외래 키와 매핑한 연관관계를 기본 키에도 매핑하겠다는 뜻
+        @MapsId(value = "parentId")
+        @JoinColumn(name = "child_parent_id", referencedColumnName = "parent_id")
+        @ManyToOne
+        private Parent parent;
+    
+        private String name;
+    
+        @Override
+        public String toString() {
+            return "Child{" +
+                    "childId=" + childId +
+                    ", parent=" + parent +
+                    ", name='" + name + '\'' +
+                    '}';
+        }
+    }
+    </code>
+</pre>
+
+GrandChildId.java
+<pre>
+    <code>
+    @NoArgsConstructor
+    @Setter
+    @Getter
+    @Embeddable
+    public class GrandChildId implements Serializable {
+    
+        private ChildId grandChildParentId;
+    
+        @Column(name = "grand_child_id")
+        private String grandChildId;
+    
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            GrandChildId that = (GrandChildId) o;
+            return Objects.equals(grandChildParentId, that.grandChildParentId) &&
+                    Objects.equals(grandChildId, that.grandChildId);
+        }
+    
+        @Override
+        public int hashCode() {
+            return Objects.hash(grandChildParentId, grandChildId);
+        }
+    
+        @Override
+        public String toString() {
+            return "GrandChildId{" +
+                    "grandChildParentId=" + grandChildParentId +
+                    ", grandChildId='" + grandChildId + '\'' +
+                    '}';
+        }
+    }
+    </code>
+</pre>
+
+GrandChild.java
+<pre>
+    <code>
+    @NoArgsConstructor
+    @Setter
+    @Getter
+    @Table(name = "identifying_relationship_embedded_id_grand_child")
+    @Entity(name = "IdentifyingRelationshipEmbeddedIdGrandChild")
+    public class GrandChild {
+    
+        @EmbeddedId
+        private GrandChildId grandChildId;
+    
+        @JoinColumns({
+                @JoinColumn(name = "grand_child_grand_parent_id", referencedColumnName = "child_parent_id")
+                , @JoinColumn(name = "grand_child_parent_id", referencedColumnName = "child_id")
+        })
+        // 외래 키와 매핑한 연관관계를 기본 키에도 매핑하겠다는 뜻
+        @MapsId(value = "grandChildParentId")
+        @ManyToOne
+        private Child child;
+    
+        private String name;
+    
+        @Override
+        public String toString() {
+            return "GrandChild{" +
+                    "grandChildId=" + grandChildId +
+                    ", child=" + child +
+                    ", name='" + name + '\'' +
+                    '}';
+        }
+    }
+    </code>
+</pre>
+
+### 4. 프록시

@@ -48,6 +48,9 @@
         <class>jpabook.start.mapping.composite_key.identifying_relationship.embedded_id.Child</class>
         <class>jpabook.start.mapping.composite_key.identifying_relationship.embedded_id.GrandChild</class>
 
+        <class>jpabook.start.proxy.basic.Member</class>
+        <class>jpabook.start.proxy.basic.Team</class>
+
 
         <properties>
             <!-- 필수 속성 -->

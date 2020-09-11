@@ -16,7 +16,6 @@ import javax.persistence.Table;
  * 이 어노테이션 생략 시 Entity Name 이 기본 값으로 들어가게 된다 (@Entity(name = "JoinStrategyBook"))
  */
 @DiscriminatorValue(value = "MOVIE")
-@Table(name = "single_table_strategy_movie")
 @Entity(name = "SingleTableStrategyMovie")
 public class Movie extends Item {
 
