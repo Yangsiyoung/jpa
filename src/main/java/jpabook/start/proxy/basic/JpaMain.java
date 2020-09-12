@@ -75,13 +75,30 @@ public class JpaMain {
             // class jpabook.start.proxy.basic.Member$HibernateProxy
             System.out.println("referenceMember1 type is " + referenceMember1.getClass());
 
+            // Proxy 객체가 초기화 되었는지 확인
+            boolean loaded = entityManager.getEntityManagerFactory().getPersistenceUnitUtil().isLoaded(referenceMember1);
+
+            // 아직 Proxy 객체가 실제로 사용되지 않았으므로 false
+            System.out.println("referenceMember is loaded ? " + loaded);
+
             // Proxy Entity 는 식별자를 보관하고 있으므로, referenceMember1.getId() 호출시에는 SELECT 쿼리 발생 X
             System.out.println("referenceMember1 id is " + referenceMember1.getId());
+
+            loaded = entityManager.getEntityManagerFactory().getPersistenceUnitUtil().isLoaded(referenceMember1);
+
+            // 아직 Proxy 객체가 실제로 사용되지 않았으므로 false
+            System.out.println("referenceMember is loaded ? " + loaded);
 
             // 실제로 referenceMember1 Proxy Entity 가 사용될 때 FIND 해 옴
             System.out.println(referenceMember1);
             System.out.println(referenceMember1.getUserName());
             System.out.println(referenceMember1.getTeam());
+
+            loaded = entityManager.getEntityManagerFactory().getPersistenceUnitUtil().isLoaded(referenceMember1);
+
+            // Proxy 객체가 실제로 사용되었으므로 true
+            System.out.println("referenceMember is loaded ? " + loaded);
+
 
             // 위에서 동일한 식별자를 가진 Entity 를 리턴하지않고 Entity 의 Proxy Class 를 리턴 함.
             Member referenceMember2 = entityManager.getReference(Member.class, member1.getId());

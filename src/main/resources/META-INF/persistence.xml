@@ -51,6 +51,13 @@
         <class>jpabook.start.proxy.basic.Member</class>
         <class>jpabook.start.proxy.basic.Team</class>
 
+        <class>jpabook.start.proxy.eager_loading.Member</class>
+        <class>jpabook.start.proxy.eager_loading.Team</class>
+
+        <class>jpabook.start.proxy.lazy_loading.Member</class>
+        <class>jpabook.start.proxy.lazy_loading.Team</class>
+
+        <class>jpabook.start.value_type.embedded_type.Member</class>
 
         <properties>
             <!-- 필수 속성 -->

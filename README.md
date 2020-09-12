@@ -1487,4 +1487,91 @@ GrandChild.java
     </code>
 </pre>
 
-### 4. 프록시
+# 3. Proxy
+연관관계를 맺게되면 Entity 를 불러올 때 해당 Entity 와 연관된 Entity 의 Table 을 같이
+조회(Join)한다.  
+하지만 연관된 Entity 를 항상 사용하는 것이 아니라면 실제로 사용될 때까지 DB 조회를 지연하는 것이  
+좋은데 이를 지연 로딩이라고 한다.  
+
+지연 로딩 기능을 사용하기 위해서는 실제 Entity 객체 대신에 해당 Entity 인 것처럼 행동하다  
+실제 사용될 때 까지 DB 조회를 지연하기 위한 가짜 객체가 필요한데 이것은 Proxy 객체라고 한다.
+
+## 1. Entity 조회 시 Proxy 객체로 조회하기
+<pre>
+    <code>
+    /**
+     * Entity 조회(즉시 로딩) : entityManager.find();
+     * Entity Proxy 객체 조회(지연 로딩) : entityManager.getReference();
+     *
+     * Proxy Class 의 경우 실제 Entity Class 를 상속받아 만들어지기 때문에
+     * Entity 와 겉모습이 같다.
+     *
+     * 하지만 entityManager.find() 를 통해 조회할 시 해당 Entity 를 즉시 조회하도록
+     * Persistence Context 에 요청하고 Persistence Context 에 없으면 DB 를 조회하는데,
+     *
+     * entityManager.getReference() 를 통해 조회할 시 해당 Entity 를 상속 받은 Proxy 객체가 리턴되고,
+     * Proxy 객체는 마치 해당 Entity 처럼 다뤄지는데 빈 값이 들어있는 껍데기에 불과하다.
+     *
+     * 실제로 referenceMember1.getUserName() 처럼 사용될 때 Persistence Context 에 실제 엔티티 정보를 가져오도록
+     * 요청을 한다.(DB 에 SELECT 쿼리가 나가며 Entity 정보를 가져와서 프록시 객체에 세팅한다. => 조회해와도 Type 이 Proxy Class 이다.)
+     *
+     * 만약에 entityManager.getReference() 를 사용해서 조회하는 Entity 가 Persistence Context 에 존재하는 Entity 라면
+     * 바로 해당 Entity 를 리턴하기 때문에 Type 이 Entity Class 이다.
+     * (Proxy Class 를 사용하는 이유는 불필요한 쿼리를 발생시키지 않고 정말 필요할 때 쿼리를 발생시키기 위함인데
+     *  이미 Persistence Context 에 있는 Entity 일 경우에는 쿼리를 사용하지 않아도 가져올 수 있기 때문이라고 생각한다.)
+     *
+     * Persistence Context 해당 Entity 정보를 조회 요청을 하고, Persistence Context 해당 Entity 정보가 없으면 빈 껍데기인 Proxy Class 가
+     * 실제로 사용될때에 DB 에 SELECT 쿼리를 보내서 Persistence Context 에 해당 Entity 의 정보를 가져와 세팅하거나
+     * Persistence Context 에 해당 Entity 정보를 조회 요청을 하고, Persistence Context 해당 Entity 정보가 있으면,
+     * Entity 를 그대로 받아서 Proxy Class 가 아닌 해당 Entity 를 리턴하는 등 Persistence Context 에게 의존하고 있다.
+     *
+     * 따라서 이 Proxy Class 는 준영속 상태가 되면 사용이 불가능 하다.
+     *
+     */
+    Member referenceMember1 = entityManager.getReference(Member.class, member1.getId());
+    </code>
+</pre>
+## 2. Proxy 특징
+
+* Proxy 는 실제 사용될 떄에 Persistence Context 에 실제 Entity 생성을 요청하는데 이것이 Proxy 초기화.
+
+* Persistence Context 는 Proxy 로 부터 Entity 생성을 요청받는데 이 때 DB 를 조회한다.
+
+* Persistence Context 로 부터 Entity 객체를 받으면 이에 대한 참조를 Proxy 객체 내 변수에 저장한다.
+
+*  entityManager.getReference() 메서드를 통해 Proxy 객체를 생성하려할때 해당 Entity 가 Persistence Context 에  
+   존재한다면 Proxy 객체가 아닌 Entity 를 리턴한다.
+
+* 처음 사용할 때 한 번만 조회 된다.
+
+* Proxy 객체가 초기화 되더라도 Proxy 객체가 Entity 로 바뀌는 것은 아니다.
+
+* Proxy 객체는 원본 Entity 상속받은 객체이다.
+
+* 따라서 타입 체크시에 주의해야한다.
+
+* Proxy 객체가 실제 사용될 때 초기화를 한다고 했는데 team.getId() 와 같이 식별자를 조회하는  
+  행위를 하면 프록시가 초기화 되지 않는다.  
+  (entityManager.getReference() 메서드 호출시에 이미 식별자를 넘겨서 Proxy 객체가 들고 있기 때문)
+
+
+## 3. 즉시 로딩
+조회하려는 Entity 와 연관된 Entity 를 즉시 조회한다.  
+(Hibernate 는 가능한 SQL Join 을 통해 한 번에 조회)
+
+## 4. 지연 로딩
+조회하려는 Entity 와 연관된 Entity 를 Proxy 로 조회한다.  
+(Proxy 를 실제로 사용할 때 초기화를 통해 DB를 조회한다.)
+
+
+## 5. Fetch 전략
+개발시에 연관관계에 있는 Entity 들 중 어떤 Entity 들이 자주 함께 사용되고,  
+어떤 Entity 는 필요할 때 조회해오는 것이 좋을지 판단하기 힘들다.  
+
+따라서 개발시에는 모든 연관관계에 지연 로딩을 사용하고,  
+어느정도 틀이 잡히고 서비스에 대한 도메인 지식이 생기면  
+즉시 로딩이 필요하다고 판단 되는 경우 즉시 로딩을 적용하면 될 것 같다.
+
+## 6. 영속성 전이
+나중에 필요할 때 공부해보도록 하겠다.
+
