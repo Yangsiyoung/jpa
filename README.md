@@ -1575,3 +1575,238 @@ GrandChild.java
 ## 6. 영속성 전이
 나중에 필요할 때 공부해보도록 하겠다.
 
+# 4. 값 타입
+JPA 에는 Entity 와 Value 두가지 type 이 있다.  
+Entity 는 Table 과 매핑되는 Entity 객체이며,  
+Value 타입은 Entity 에서 값 처럼 사용되는 객체이다.  
+
+일반적으로 값 타입은 Entity 의 프로퍼티 중 연관있는 프로퍼티를 묶어  
+Value Class 로 만들고 이를 @Embeddable 로 선언해 값 객체임을 나타내고  
+Entity 에서 @Embedded 를 통해 값 객체를 사용하고 있음을 나타낸다.  
+
+Value Class 를 사용해서 Entity 를 구성하면 어떤 이점이 있는지 코드를 통해 이해해보자.
+
+MemberWithOutEmbedded.java
+<pre>
+    <code>
+    @AllArgsConstructor
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @Getter
+    @Table(name = "member_with_out_embedded")
+    @Entity(name = "MemberWithOutEmbedded")
+    public class MemberWithOutEmbedded {
+    
+        @Column(name = "member_id")
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        @Id
+        private Integer id;
+    
+        private String name;
+    
+        @Column(name = "member_city")
+        private String city;
+    
+        private String street;
+    
+        @Column(name = "zip_code")
+        private String zipcode;
+    
+        private LocalDate startDate;
+    
+        private LocalDate endDate;
+    
+        @Override
+        public String toString() {
+            return "MemberWithOutEmbedded{" +
+                    "id=" + id +
+                    ", name='" + name + '\'' +
+                    ", city='" + city + '\'' +
+                    ", street='" + street + '\'' +
+                    ", zipcode='" + zipcode + '\'' +
+                    ", startDate=" + startDate +
+                    ", endDate=" + endDate +
+                    '}';
+        }
+    }
+    </code>
+</pre>
+
+Table
+<img width="545" alt="스크린샷 2020-09-11 오후 10 39 32" src="https://user-images.githubusercontent.com/8858991/92997109-9cc91e80-f54b-11ea-8fad-9844dd350457.png">
+
+
+위와 같은 Entity 가 있다고 하자, 해당 Entity 에는 여러 프로퍼티가 있다.  
+총 7개의 프로퍼티가 있는데 이름, 나이, 사는 도시, 사는 곳의 도로명, 사는 곳의 우편코드,  
+시작일, 종료일이 있다.  
+
+이 Entity 는 어떤 회사의 직원 정보들이라고 할 때, 크게 식별자, 이름, 사는 곳(집 주소), 근무기간  
+4가지 정보를 담고 있다.  
+
+이렇게 4가지 정보를 담고있는데 Entity 의 프로퍼티는 7개로 너무 많다고 느껴진다.  
+7개의 프로퍼티는 직원 Entity 에 필요한 프로퍼티가 맞지만 객체지향적으로 묶어서 나타낼 수 있다면  
+더 좋다고 생각된다.  
+
+아래의 임베디드 타입을 보고 한번 생각해보자.
+## 1. 임베디드 타입(복합 값 타입)
+
+Member.java
+<pre>
+    <code>
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @Table(name = "value_type_embedded_type_member")
+    @Entity(name = "ValueTypeEmbeddedTypeMember")
+    public class Member {
+    
+        @Column(name = "member_id")
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        @Id
+        private Integer id;
+    
+        private String name;
+    
+        // 값 타입을 사용
+        @Embedded
+        private Period period;
+    
+        // 값 타입을 사용
+        @Embedded
+        private Address address;
+    
+        @Override
+        public String toString() {
+            return "Member{" +
+                    "id=" + id +
+                    ", name='" + name + '\'' +
+                    ", period=" + period +
+                    ", address=" + address +
+                    '}';
+        }
+    }
+    </code>
+</pre>
+
+Period.java
+<pre>
+    <code>
+    /**
+     * 값 으로 사용할 객체이기 때문에
+     * Setter 를 없애고 값 변경이 필요할 경우
+     * 새로 만들어서 사용하도록 유도
+     */
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    // 값 타입을 정의
+    @Embeddable
+    public class Period {
+    
+        private LocalDate startDate;
+    
+        private LocalDate endDate;
+    
+        @Override
+        public String toString() {
+            return "Period{" +
+                    "startDate=" + startDate +
+                    ", endDate=" + endDate +
+                    '}';
+        }
+    }
+    </code>
+</pre>
+
+Address.java
+<pre>
+    <code>
+    /**
+     * 값 으로 사용할 객체이기 때문에
+     * Setter 를 없애고 값 변경이 필요할 경우
+     * 새로 만들어서 사용하도록 유도
+     */
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    // 값 타입을 정의
+    @Embeddable
+    public class Address {
+    
+        // 이 값 객체를 사용하는 Table 에 어떤 컬럼 명으로 사용할지 설정 가능
+        @Column(name = "member_city")
+        private String city;
+    
+        private String street;
+    
+        // 이 값 객체를 사용하는 Table 에 어떤 컬럼 명으로 사용할지 설정 가능
+        @Column(name = "zip_code")
+        private String zipcode;
+    
+        @Override
+        public String toString() {
+            return "Address{" +
+                    "city='" + city + '\'' +
+                    ", street='" + street + '\'' +
+                    ", zipcode='" + zipcode + '\'' +
+                    '}';
+        }
+    }
+    </code>
+</pre>
+
+Table
+<img width="545" alt="스크린샷 2020-09-11 오후 10 39 32" src="https://user-images.githubusercontent.com/8858991/92997109-9cc91e80-f54b-11ea-8fad-9844dd350457.png">
+
+만들어지는 Table 의 컬럼 수는 똑같지만 Entity 의 프로퍼티를 보게되면 위와 같이 Embedded type 을 사용해서  
+구현하는 것이 관련 Class 수는 많아지지만 프로퍼티 수가 줄어들고 더욱 명확히 의미를 나타낼 수 있다.  
+
+나는 의미를 더 명확하게 나타낼 수 있다면 프로퍼티 1개에 대해서라도 의미를 더욱 명확히 나타낼 수 있다면  
+해당 프로퍼티를 위한 값 객체를 생성하는 것이 개인적으로 맞다고 생각한다.  
+
+## 2. 임베디드 타입 응용(복합 값 타입)
+아래 Period 라는 Value Class 를 보자, 
+<pre>
+    <code>
+    /**
+     * 값 으로 사용할 객체이기 때문에
+     * Setter 를 없애고 값 변경이 필요할 경우
+     * 새로 만들어서 사용하도록 유도
+     */
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    // 값 타입을 정의
+    @Embeddable
+    public class Period {
+    
+        private LocalDate startDate;
+    
+        private LocalDate endDate;
+    
+        @Override
+        public String toString() {
+            return "Period{" +
+                    "startDate=" + startDate +
+                    ", endDate=" + endDate +
+                    '}';
+        }
+    }
+    </code>
+</pre>
+
+이 Value Class 는 시작과 끝을 나타내는 기간을 표현하므로 여러 군데서 다양한 의미로 사용될 수 있다.  
+예를 들어 입사일 - 퇴직일과 같은 근무 기간일 수 도 있고, 입학일 - 졸업일과 같은 재학 기간일 수도 있다.  
+
+따라서 사용하는 곳에 따라 시작일 - 종료일에 대한 컬럼명이 다를 수도 있고 해당 Value Class 에 정의한  
+매핑 정보를 재정의해야할 때가 있다. 
+
+아래의 코드를 보며 재정의를 어떻게 하는지, 어떨 때 하는지 깨달아보도록 하겠다.  
+
+
+
+  
+   
+
+  
+
+

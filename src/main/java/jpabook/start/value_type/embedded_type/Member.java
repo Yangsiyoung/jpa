@@ -21,9 +21,11 @@ public class Member {
 
     private String name;
 
+    // 값 타입을 사용
     @Embedded
     private Period period;
 
+    // 값 타입을 사용
     @Embedded
     private Address address;
 
