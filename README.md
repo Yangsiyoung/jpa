@@ -1803,11 +1803,12 @@ Table
 아래의 코드를 보며 재정의를 어떻게 하는지, 어떨 때 하는지 깨달아보도록 하겠다. 
  
 Table  
-employee
+employee  
 <img width="519" alt="스크린샷 2020-09-13 오후 2 22 16" src="https://user-images.githubusercontent.com/8858991/93044711-66e18280-f690-11ea-98c4-61e5ca725b17.png">
 
-student
+student  
 <img width="492" alt="스크린샷 2020-09-13 오후 2 22 28" src="https://user-images.githubusercontent.com/8858991/93044716-68ab4600-f690-11ea-8eec-d3e393f4d485.png">
+
 
 Period.java
 <pre>
