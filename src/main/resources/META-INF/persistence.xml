@@ -57,7 +57,12 @@
         <class>jpabook.start.proxy.lazy_loading.Member</class>
         <class>jpabook.start.proxy.lazy_loading.Team</class>
 
-        <class>jpabook.start.value_type.embedded_type.Member</class>
+        <class>jpabook.start.value_type.embedded_type.basic.Member</class>
+
+        <class>jpabook.start.value_type.embedded_type.advanced.Employee</class>
+        <class>jpabook.start.value_type.embedded_type.advanced.Student</class>
+
+        <class>jpabook.start.value_type.collection.Member</class>
 
         <properties>
             <!-- 필수 속성 -->
@@ -84,4 +89,36 @@
         </properties>
     </persistence-unit>
 
+    <persistence-unit name="query">
+
+        <class>jpabook.start.object_oriented_query.jpql.basic.Member</class>
+
+        <class>jpabook.start.object_oriented_query.criteria.basic.Member</class>
+
+        <class>jpabook.start.object_oriented_query.query_dsl.basic.Member</class>
+
+        <properties>
+            <!-- 필수 속성 -->
+            <property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>
+            <property name="javax.persistence.jdbc.user" value="sa"/>
+            <property name="javax.persistence.jdbc.password" value=""/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:h2:tcp://localhost/~/test"/>
+            <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect" />
+
+            <!-- 옵션 -->
+            <property name="hibernate.show_sql" value="true" />
+            <property name="hibernate.format_sql" value="true" />
+            <property name="hibernate.use_sql_comments" value="true" />
+
+            <!-- 기본 키 생성 전략 사용 여부(ex. @GeneratedValue IDENTITY, SEQUENCE, TABLE) -->
+            <property name="hibernate.id.new_generator_mappings" value="true"/>
+
+            <!--            <property name="hibernate.ejb.naming_strategy" value="org.hibernate.cfg.ImprovedNamingStrategy"/>-->
+            <!-- Hibernate 5 부터는 org.hibernate.boot.model.naming.PhysicalNamingStrategy Interface 를 implements 해야함
+                org.hibernate.boot.model.naming.ImplicitNamingStrategy Interface 도 있으니 나중에 찾아보자-->
+            <property name="hibernate.physical_naming_strategy" value="jpabook.start.identifier_strategy.PhysicalNamingStrategyImpl"/>
+
+            <property name="hibernate.hbm2ddl.auto" value="create" />
+        </properties>
+    </persistence-unit>
 </persistence>

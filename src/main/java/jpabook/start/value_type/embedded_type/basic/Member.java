@@ -1,4 +1,4 @@
-package jpabook.start.value_type.embedded_type;
+package jpabook.start.value_type.embedded_type.basic;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
