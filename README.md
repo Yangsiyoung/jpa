@@ -1800,7 +1800,125 @@ Table
 따라서 사용하는 곳에 따라 시작일 - 종료일에 대한 컬럼명이 다를 수도 있고 해당 Value Class 에 정의한  
 매핑 정보를 재정의해야할 때가 있다. 
 
-아래의 코드를 보며 재정의를 어떻게 하는지, 어떨 때 하는지 깨달아보도록 하겠다.  
+아래의 코드를 보며 재정의를 어떻게 하는지, 어떨 때 하는지 깨달아보도록 하겠다. 
+ 
+Table  
+employee
+<img width="519" alt="스크린샷 2020-09-13 오후 2 22 16" src="https://user-images.githubusercontent.com/8858991/93044711-66e18280-f690-11ea-98c4-61e5ca725b17.png">
+
+student
+<img width="492" alt="스크린샷 2020-09-13 오후 2 22 28" src="https://user-images.githubusercontent.com/8858991/93044716-68ab4600-f690-11ea-8eec-d3e393f4d485.png">
+
+Period.java
+<pre>
+    <code>
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @Embeddable
+    public class Period {
+    
+        // 해당 프로퍼티에 대한 컬럼 명 지정(사용하는 곳에서 @AttributeOverride 속성을 사용해 재정의 가능)
+        @Column(name = "start_date")
+        private LocalDate startDate;
+    
+        // 해당 프로퍼티에 대한 컬럼 명 지정(사용하는 곳에서 @AttributeOverride 속성을 사용해 재정의 가능)
+        @Column(name = "end_date")
+        private LocalDate endDate;
+    
+        @Override
+        public String toString() {
+            return "Period{" +
+                    "startDate=" + startDate +
+                    ", endDate=" + endDate +
+                    '}';
+        }
+    }
+    </code>
+</pre>
+
+Employee.java
+<pre>
+    <code>
+    @AllArgsConstructor
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @Getter
+    @Table(name = "value_type_embedded_type_advanced_employee")
+    @Entity(name = "ValueTypeEmbeddedTypeAdvancedEmployee")
+    public class Employee {
+    
+        @Column(name = "employee_id")
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        @Id
+        private Integer id;
+    
+        private String name;
+    
+        /**
+         * @Embedded 로 사용한 @Embeddable 로 선언된 Value Class 의 속성을 재정의 함
+         * @AttributeOverrides @Embeddable 로 선언된 Value Class 의 여러 속성을 재정의 할 때 사용
+         * @AttributeOverride(name = "재정의 할 Value Class 의 프로퍼티", column = @Column(name = "어떤 컬럼명으로 사용하고싶은지")
+         */
+        @AttributeOverrides({
+                @AttributeOverride(name = "startDate", column = @Column(name = "employment_start_date"))
+                , @AttributeOverride(name = "endDate", column = @Column(name = "employment_end_date"))
+        })
+        @Embedded
+        private Period employmentPeriod;
+    
+        @Override
+        public String toString() {
+            return "Employee{" +
+                    "id=" + id +
+                    ", name='" + name + '\'' +
+                    ", employmentPeriod=" + employmentPeriod +
+                    '}';
+        }
+    }
+    </code>
+</pre>
+
+
+Student.java
+<pre>
+    <code>
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @Table(name = "value_type_embedded_type_advanced_student")
+    @Entity(name = "ValueTypeEmbeddedTypeAdvancedStudent")
+    public class Student {
+    
+        @Column(name = "student_id")
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        @Id
+        private Integer id;
+    
+        private String name;
+    
+        /**
+         * @Embedded 로 사용한 @Embeddable 로 선언된 Value Class 의 속성을 재정의 함
+         * @AttributeOverrides @Embeddable 로 선언된 Value Class 의 여러 속성을 재정의 할 때 사용
+         * @AttributeOverride(name = "재정의 할 Value Class 의 프로퍼티", column = @Column(name = "어떤 컬럼명으로 사용하고싶은지")
+         */
+        @AttributeOverrides({
+                @AttributeOverride(name = "startDate", column = @Column(name = "attendance_start_date"))
+                , @AttributeOverride(name = "endDate", column = @Column(name = "attendance_end_date"))
+        })
+        @Embedded
+        private Period attendancePeriod;
+    
+        @Override
+        public String toString() {
+            return "Student{" +
+                    "id=" + id +
+                    ", name='" + name + '\'' +
+                    ", attendancePeriod=" + attendancePeriod +
+                    '}';
+        }
+    }
+    </code>
+</pre>
 
 
 
