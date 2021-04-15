@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    // querydsl 추가
     id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
 }
 
@@ -26,11 +27,19 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
+
+//querydsl 추가 시작
+def querydslDir = "$buildDir/generated"
 querydsl {
     jpa = true
-    querydslSourcesDir = "$buildDir/generated-source"
+    querydslSourcesDir = querydslDir
 }
-
+sourceSets {
+    main.java.srcDir querydslDir
+}
+configurations {
+    querydsl.extendsFrom compileClasspath
+}
 compileQuerydsl {
     options.annotationProcessorPath = configurations.querydsl
 }

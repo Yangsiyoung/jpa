@@ -176,7 +176,7 @@ Table을 만들어줘야하기 때문)
   
   Member.java
   <pre>
-    <code>
+    <code> 
     @NoArgsConstructor
     @Setter
     @Getter
@@ -1921,11 +1921,79 @@ Student.java
     </code>
 </pre>
 
-
-
-  
    
 
   
+  
+# 3. QueryDSL
+앞에서는 테이블에 대한 연관관계를 설정하는 법을 익혔다면,  
+이젠 객체를 활용하여 쿼리를 어떻게 작성하는지를 익혀보자.  
+JPQL, Criteria 를 사용할 수 있지만 나는 조금 범위를 스킵해서
+바로 QueryDSL 를 살펴보려한다.  
+
+일단 사용법부터 익히자.. 그러기위해서는 일단 코드가 짱이다.  
+
+```java
+public class JpaMain {
+    public static void main(String[] args) {
+        EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("query");
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        EntityTransaction entityTransaction = entityManager.getTransaction();
+
+        try {
+
+            entityTransaction.begin();
+
+            Member member1 = new Member(null, "member1", 28);
+            entityManager.persist(member1);
+
+            Posts posts1 = new Posts(null, "title1", "content1", member1.getId());
+            entityManager.persist(posts1);
+
+            Member member2 = new Member(null, "member2", 28);
+            entityManager.persist(member2);
+
+            Posts posts2 = new Posts(null, "title2", "content2", member2.getId());
+            entityManager.persist(posts2);
+
+            entityManager.clear();
+            JPAQuery<Member> query = new JPAQuery(entityManager);
+            QMember member = new QMember("myQMember");
+
+            List<Member> findMembers = query.from(member).where(member.age.eq(28)).fetch();
+
+            System.out.println("findMembers info are " + findMembers);
+
+            JPAQuery<Posts> queryForPosts = new JPAQuery(entityManager);
+            QPosts posts = new QPosts("myQPosts");
+            List<Posts> findPosts = queryForPosts.from(posts).where(posts.memberId.eq(findMembers.get(0).getId())).fetch();
+
+            System.out.println("findPosts info are " + findPosts);
+
+            entityTransaction.commit();
+
+        } catch(Exception e) {
+            entityTransaction.rollback();
+            System.out.println(e.toString());
+        } finally {
+            entityManager.close();
+        }
+        entityManagerFactory.close();
+    }
+}
+```
+
+일단 테이블에 매핑되는 객체는 Entity 가 아니라 그것을 한번감싼 QEntity 가 된다.  
+그리고 JPAQuery 를 EntityManager 로부터 생성하는것도 보인다.  
+
+그럼 생각해야할거는 아래와 같다.    
+1. JPAQuery 인스턴스를 만들어서 Query 를 작성할 준비를 한다.  
+2. QEntity 기준으로 테이블 매핑을 한다.  
+3. DSL 을 활용해 쿼리를 작성해 나간다.  
+
+내가 이해한 바로는 QClass 들의 경우 컴파일 타임에 빌드되어 생성되고  
+그것을 런타임때 사용하는 것 같다.
+
+
 
 

@@ -97,6 +97,8 @@
 
         <class>jpabook.start.object_oriented_query.query_dsl.basic.Member</class>
 
+        <class>jpabook.start.object_oriented_query.query_dsl.basic.Posts</class>
+
         <properties>
             <!-- 필수 속성 -->
             <property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>
